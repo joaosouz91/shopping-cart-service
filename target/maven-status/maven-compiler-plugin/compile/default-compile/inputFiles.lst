@@ -1,5 +1,5 @@
-C:\springboot-workspaces\jax-rs-service\shopping-cart-service\src\br\com\shoppingcartservice\entity\ShoppingCart.java
-C:\springboot-workspaces\jax-rs-service\shopping-cart-service\src\br\com\shoppingcartservice\entity\ItemCart.java
-C:\springboot-workspaces\jax-rs-service\shopping-cart-service\src\br\com\shoppingcartservice\entity\Product.java
-C:\springboot-workspaces\jax-rs-service\shopping-cart-service\src\br\com\shoppingcartservice\entity\ShoppingCartFactory.java
-C:\springboot-workspaces\jax-rs-service\shopping-cart-service\src\br\com\shoppingcartservice\controller\ShoppingCartServiceController.java
+C:\eclipse-workspaces\shopping-cart-service\shopping-cart\src\br\com\shoppingcart\entity\ItemCart.java
+C:\eclipse-workspaces\shopping-cart-service\shopping-cart\src\br\com\shoppingcart\service\ShoppingCartService.java
+C:\eclipse-workspaces\shopping-cart-service\shopping-cart\src\br\com\shoppingcart\entity\ShoppingCart.java
+C:\eclipse-workspaces\shopping-cart-service\shopping-cart\src\br\com\shoppingcart\entity\Product.java
+C:\eclipse-workspaces\shopping-cart-service\shopping-cart\src\br\com\shoppingcart\controller\ShoppingCartController.java

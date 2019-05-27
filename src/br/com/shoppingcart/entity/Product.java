@@ -1,4 +1,4 @@
-package br.com.shoppingcartservice.entity;
+package br.com.shoppingcart.entity;
 
 import java.math.BigDecimal;
 
@@ -8,6 +8,12 @@ public class Product {
 	private String description;
 	private BigDecimal value;
 	
+	public Product(String code, String description, BigDecimal value) {
+		this.code = code;
+		this.description = description;
+		this.value = value;
+	}
+
 	public String getCode() {
 		return code;
 	}

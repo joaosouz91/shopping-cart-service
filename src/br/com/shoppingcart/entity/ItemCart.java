@@ -1,4 +1,4 @@
-package br.com.shoppingcartservice.entity;
+package br.com.shoppingcart.entity;
 
 import java.math.BigDecimal;
 
@@ -8,11 +8,17 @@ public class ItemCart {
 	private BigDecimal unitaryValue;
 	private long quantity;
 	
+	public ItemCart(String code, BigDecimal unitaryValue, long quantity) {
+		this.code = code;
+		this.unitaryValue = unitaryValue;
+		this.quantity = quantity;
+	}
+
 	public String getCode() {
 		return code;
 	}
 	
-	public void setCode(String code) {
+	public void setCode(String code) {				
 		this.code = code;
 	}
 	
