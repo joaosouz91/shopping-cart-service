@@ -17,7 +17,7 @@ import br.com.shoppingcart.dto.ItemCartDTO;
 public class Cart {
 
 	private String clientCode;
-	private static List<ItemCart> itemsList = Collections.synchronizedList(new ArrayList<ItemCart>());
+	private List<ItemCart> itemsList = Collections.synchronizedList(new ArrayList<ItemCart>());
 
 	public Cart(String clientCode) {
 		this.clientCode = clientCode;
@@ -49,11 +49,8 @@ public class Cart {
 
 		try {
 			ItemCart itemCart = new Gson().fromJson(json, ItemCart.class);
-
 			if (itemCart != null && itemCart.getCode() != null) {
-
 				for (ItemCart i : itemsList) {
-
 					if (i.equals(itemCart)) {
 
 						i.setQuantity(i.getQuantity() + itemCart.getQuantity());
@@ -64,7 +61,6 @@ public class Cart {
 						return new ItemCartDTO(i, HttpServletResponse.SC_OK);
 					}
 				}
-
 				itemsList.add(itemCart);
 				return new ItemCartDTO(itemCart, HttpServletResponse.SC_CREATED);
 			}
@@ -73,6 +69,26 @@ public class Cart {
 			System.out.println("=== Não foi possível adicionar o item ao carrinho ===");
 		} catch (Exception e) {
 			System.out.println("=== Não foi possível adicionar o item ao carrinho ===");
+		}
+		return null;
+	}
+	
+	public ItemCartDTO addItem(ItemCart itemCart) {
+
+		if (itemCart != null && itemCart.getCode() != null) {
+			for (ItemCart i : itemsList) {
+				if (i.equals(itemCart)) {
+
+					i.setQuantity(i.getQuantity() + itemCart.getQuantity());
+
+					if (i.getUnitaryValue() != itemCart.getUnitaryValue()) {
+						i.setUnitaryValue(itemCart.getUnitaryValue());
+					}
+					return new ItemCartDTO(i, HttpServletResponse.SC_OK);
+				}
+			}
+			itemsList.add(itemCart);
+			return new ItemCartDTO(itemCart, HttpServletResponse.SC_CREATED);
 		}
 		return null;
 	}

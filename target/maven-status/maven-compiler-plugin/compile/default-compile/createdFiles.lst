@@ -1,5 +1,8 @@
-br\com\shoppingcart\entity\ShoppingCart.class
+br\com\shoppingcart\entity\Cart.class
 br\com\shoppingcart\entity\ItemCart.class
+br\com\shoppingcart\dto\ItemCartDTO.class
 br\com\shoppingcart\service\ShoppingCartService.class
-br\com\shoppingcart\controller\ShoppingCartController.class
+br\com\shoppingcart\dto\CartDTO.class
 br\com\shoppingcart\entity\Product.class
+br\com\shoppingcart\dto\CartListDTO.class
+br\com\shoppingcart\controller\ShoppingCartController.class
