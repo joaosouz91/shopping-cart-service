@@ -5,33 +5,52 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.omg.CORBA.portable.ApplicationException;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import br.com.shoppingcart.dto.CartDTO;
 import br.com.shoppingcart.dto.CartListDTO;
+import br.com.shoppingcart.dto.ItemCartDTO;
 import br.com.shoppingcart.entity.Cart;
 import br.com.shoppingcart.entity.ItemCart;
-import br.com.shoppingcart.entity.Product;
+import br.com.shoppingcart.enums.OperationStatus;
 
 public class ShoppingCartService {
 
 	private static List<Cart> cartList = Collections.synchronizedList(new ArrayList<Cart>());
 	
-	public ShoppingCartService() {
-		
-		Product p = new Product("1", "teste", new BigDecimal("14.78"));
-		ItemCart ic = new ItemCart(p.getCode(), new BigDecimal("16.90"), 3);
-		Cart c = new Cart("1");
-		c.addItem(ic);
-		cartList.add(c);
-	}
-
+	public ShoppingCartService() {}
+	
+	/**
+	 * Retorna a lista de carrinhos ativos
+	 * @return
+	 */
 	public CartListDTO getAllCarts() {
 
 		if (!cartList.isEmpty()) {
 			return new CartListDTO(cartList);
+		}
+		return null;
+	}
+	
+	
+	/**
+	 * Retorna o carrinho do cliente passado como parâmetro
+	 * @param clientCode
+	 * @return
+	 */
+	public CartDTO getCart(String clientCode) {
+
+		if (!cartList.isEmpty()) {
+			for(Cart c : cartList) {
+				if(c.getClientCode().equals(clientCode)) {
+					return new CartDTO(c, 200);
+				}
+			}
 		}
 		return null;
 	}
@@ -48,7 +67,7 @@ public class ShoppingCartService {
 	 * @throws ApplicationException
 	 */
 
-	public CartDTO create(String json) throws ApplicationException {
+	public CartDTO createCart(String json) throws ApplicationException {
 
 		try {
 			Cart cart = new Gson().fromJson(json, Cart.class);
@@ -76,7 +95,7 @@ public class ShoppingCartService {
 	 *
 	 * @return BigDecimal
 	 */
-	public BigDecimal getValorTicketMedio() {
+	public BigDecimal getTicketAverageValue() {
 
 		BigDecimal valorTotalCarrinhos = BigDecimal.ZERO;
 		BigDecimal ticketMedio = BigDecimal.ZERO;
@@ -91,7 +110,7 @@ public class ShoppingCartService {
 	}
 
 	/**
-	 * Invalida um carrinho de compras quando o cliente faz um checkout ou sua
+	 * Remove um carrinho de compras quando o cliente faz um checkout ou sua
 	 * sessão expirar. Deve ser efetuada a remoção do carrinho do cliente passado
 	 * como parâmetro da listagem de carrinhos de compras.
 	 *
@@ -100,7 +119,7 @@ public class ShoppingCartService {
 	 *         parämetro tenha um carrinho de compras e e false caso o cliente não
 	 *         possua um carrinho.
 	 */
-	public boolean ivalidate(String identificacaoCliente) {
+	public boolean removeCart(String identificacaoCliente) {
 		for (Cart cart : cartList) {
 			if (cart.getClientCode().equals(identificacaoCliente)) {
 				cartList.remove(cart);
@@ -109,5 +128,47 @@ public class ShoppingCartService {
 		}
 		return false;
 	}
+	
+	/**
+	 * Atualiza o carrinho todo passado como parâmetro
+	 * @return
+	 */
+	public CartDTO updateCart() {
+		return null;
+	}
+	
+	/**
+	 * Adiciona um item ao carrinho
+	 */
+	public CartDTO addItemCart(String clientCode, String json) {
+		
+		try {
+			for(Cart c : cartList) {
+				if(c.getClientCode().equals(clientCode)){
+					ItemCart itemCart = new Gson().fromJson(json, ItemCart.class);
+					String opStatus = c.addItem(itemCart);
+					if(opStatus != null && opStatus.equals(OperationStatus.CREATED.toString())) {
+						return new CartDTO(c, HttpServletResponse.SC_CREATED);
+					}
+					else if(opStatus != null && opStatus.equals(OperationStatus.MODIFIED.toString())) {
+						return new CartDTO(c, HttpServletResponse.SC_OK);
+					}
+				}
+			}
+		} catch(JsonSyntaxException _jse) {
+			
+		} catch (Exception e) {
+			
+		}
+		return null;
+	}
+	
+	/**
+	 * Remove um item do carrinho
+	 */
+	public CartDTO removeItemCart() {
+		return null;
+	}
+	
 
 }

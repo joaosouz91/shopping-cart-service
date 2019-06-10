@@ -1,7 +1,10 @@
 package br.com.shoppingcart.dto;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import br.com.shoppingcart.entity.Cart;
 
+@XmlRootElement
 public class CartDTO {
 	
 	private Cart cart;

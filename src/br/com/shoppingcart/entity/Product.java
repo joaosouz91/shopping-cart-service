@@ -2,6 +2,9 @@ package br.com.shoppingcart.entity;
 
 import java.math.BigDecimal;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class Product {
 	
 	private String code;

@@ -5,9 +5,11 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -30,11 +32,11 @@ public class ShoppingCartController {
 	@GET
 	@Path("/status")
 	@Produces("application/json")
-	public Response getHelloWorld() {
+	public Response getStatus() {
 
 		Map<String, String> jsonMap = new HashMap<String, String>();
 		jsonMap.put("msg", "helloworld");
-		return Response.ok().status(200).entity(new Gson().toJson(jsonMap)).build();
+		return Response.ok().entity(new Gson().toJson(jsonMap)).build();
 	}
 
 	@GET
@@ -48,13 +50,27 @@ public class ShoppingCartController {
 		}
 		return Response.status(HttpServletResponse.SC_NO_CONTENT).build();
 	}
+	
+	@GET
+	@Path("/carts/{clientCode}")
+	@Produces("application/json")
+	public Response getCart(@PathParam("clientCode") String clientCode) {
+
+		CartDTO dto = cartService.getCart(clientCode);
+		if (dto != null) {
+			dto.setStatusCode(null);
+			return Response.ok().entity(new Gson().toJson(dto)).build();
+		}
+		return Response.status(HttpServletResponse.SC_NO_CONTENT).build();
+	}
 
 	@POST
 	@Path("/carts")
 	@Consumes("application/json")
+	@Produces("application/json")
 	public Response createCart(@Context UriInfo uriInfo, String json) throws ApplicationException, Exception {
 
-		CartDTO dto = cartService.create(json);
+		CartDTO dto = cartService.createCart(json);
 		if (dto != null) {
 			if (dto.getStatusCode() == 409) {
 
@@ -64,9 +80,44 @@ public class ShoppingCartController {
 			}
 			UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
 			uriBuilder.path(dto.getCart().getClientCode());
-			return Response.ok(uriBuilder.build()).status(dto.getStatusCode()).build();
+			return Response.created(uriBuilder.build()).build();
 		}
 		return Response.status(HttpServletResponse.SC_BAD_REQUEST).build();
 	}
-
+	
+	@DELETE
+	@Path("/carts/{clientCode}")
+	@Produces("application/json")
+	public Response deleteCart(@PathParam("clientCode") String clientCode) {
+		
+		if(cartService.removeCart(clientCode)) {
+			return Response.ok().build();
+		}
+		return Response.status(HttpServletResponse.SC_NO_CONTENT).build();
+	}
+	
+	@POST
+	@Path("/carts/{clientCode}/items")
+	@Consumes("application/json")
+	@Produces("application/json")
+	public Response addItemCart(@PathParam("clientCode") String clientCode, @Context UriInfo uriInfo, String json) {
+		
+		CartDTO dto = cartService.addItemCart(clientCode, json);
+		
+		if(dto != null) {
+			if(dto.getStatusCode() == HttpServletResponse.SC_CREATED) {
+				UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
+				uriBuilder.path("/carts/" + dto.getCart().getClientCode());
+				return Response.created(uriBuilder.build()).build();
+			
+			} else if(dto.getStatusCode() == HttpServletResponse.SC_OK) {
+				UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
+				uriBuilder.path("/carts/" + dto.getCart().getClientCode());
+				return Response.ok().build();
+			}
+		}
+		return Response.status(HttpServletResponse.SC_BAD_REQUEST).build();
+	}
+	
+	
 }

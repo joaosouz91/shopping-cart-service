@@ -12,7 +12,7 @@ public class ItemCartDTO {
 		this.itemCart = itemCart;
 		this.statusCode = statusCode;
 	}
-	
+
 	public ItemCart getItemCart() {
 		return itemCart;
 	}
