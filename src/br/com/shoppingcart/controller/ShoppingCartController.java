@@ -94,7 +94,7 @@ public class ShoppingCartController {
 		if(cartService.removeCart(clientCode)) {
 			return Response.ok().build();
 		}
-		return Response.status(HttpServletResponse.SC_NO_CONTENT).build();
+		return Response.noContent().build();
 	}
 	
 	@POST
@@ -149,8 +149,7 @@ public class ShoppingCartController {
 			jsonMap.put("averageTicket", averageTicket);
 			return Response.ok().entity(new Gson().toJson(jsonMap)).build();
 		}
-
-		return Response.noContent().build(); 
+		return Response.noContent().build();
 	}
 	
 	
