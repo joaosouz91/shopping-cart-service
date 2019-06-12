@@ -14,7 +14,6 @@ import com.google.gson.JsonSyntaxException;
 
 import br.com.shoppingcart.dto.CartDTO;
 import br.com.shoppingcart.dto.CartListDTO;
-import br.com.shoppingcart.dto.ItemCartDTO;
 import br.com.shoppingcart.entity.Cart;
 import br.com.shoppingcart.entity.ItemCart;
 import br.com.shoppingcart.enums.OperationStatus;
@@ -103,9 +102,9 @@ public class ShoppingCartService {
 		for (Cart carrinhoCompras : cartList) {
 			valorTotalCarrinhos = valorTotalCarrinhos.add(carrinhoCompras.getTotalValue());
 		}
-
-		ticketMedio = valorTotalCarrinhos.divide(new BigDecimal(cartList.size()));
-
+		if(!valorTotalCarrinhos.equals(BigDecimal.ZERO)) {
+			ticketMedio = valorTotalCarrinhos.divide(new BigDecimal(cartList.size()));
+		}
 		return ticketMedio;
 	}
 
@@ -130,35 +129,30 @@ public class ShoppingCartService {
 	}
 	
 	/**
-	 * Atualiza o carrinho todo passado como parâmetro
-	 * @return
-	 */
-	public CartDTO updateCart() {
-		return null;
-	}
-	
-	/**
 	 * Adiciona um item ao carrinho
+	 * @throws Exception 
 	 */
 	public CartDTO addItemCart(String clientCode, String json) {
 		
 		try {
-			for(Cart c : cartList) {
-				if(c.getClientCode().equals(clientCode)){
+			for(Cart cart : cartList) {
+				if(cart.getClientCode().equals(clientCode)){
+					
 					ItemCart itemCart = new Gson().fromJson(json, ItemCart.class);
-					String opStatus = c.addItem(itemCart);
+					String opStatus = cart.addItem(itemCart);
+					
 					if(opStatus != null && opStatus.equals(OperationStatus.CREATED.toString())) {
-						return new CartDTO(c, HttpServletResponse.SC_CREATED);
+						return new CartDTO(cart, HttpServletResponse.SC_CREATED);
 					}
 					else if(opStatus != null && opStatus.equals(OperationStatus.MODIFIED.toString())) {
-						return new CartDTO(c, HttpServletResponse.SC_OK);
+						return new CartDTO(cart, HttpServletResponse.SC_OK);
 					}
 				}
 			}
-		} catch(JsonSyntaxException _jse) {
+		} catch (JsonSyntaxException _jse) {
 			
 		} catch (Exception e) {
-			
+			throw e;
 		}
 		return null;
 	}
@@ -166,7 +160,18 @@ public class ShoppingCartService {
 	/**
 	 * Remove um item do carrinho
 	 */
-	public CartDTO removeItemCart() {
+	public CartDTO removeItemCart(String clientCode, String itemCode) {
+		
+		for(Cart cart: cartList) {
+			if(cart.getClientCode().equals(clientCode)) {
+				
+				String opStatus = cart.removeItem(itemCode);
+				
+				if(opStatus != null && opStatus.equals(OperationStatus.MODIFIED.toString())) {
+					return new CartDTO(cart, HttpServletResponse.SC_OK);
+				}
+			}
+		}
 		return null;
 	}
 	

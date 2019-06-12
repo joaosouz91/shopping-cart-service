@@ -1,5 +1,6 @@
 package br.com.shoppingcart.controller;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +36,7 @@ public class ShoppingCartController {
 	public Response getStatus() {
 
 		Map<String, String> jsonMap = new HashMap<String, String>();
-		jsonMap.put("msg", "helloworld");
+		jsonMap.put("status", "published");
 		return Response.ok().entity(new Gson().toJson(jsonMap)).build();
 	}
 
@@ -117,6 +118,39 @@ public class ShoppingCartController {
 			}
 		}
 		return Response.status(HttpServletResponse.SC_BAD_REQUEST).build();
+	}
+	
+	@DELETE
+	@Path("/carts/{clientCode}/items/{itemCode}")
+	@Produces("application/json")
+	public Response removeItemCart(@PathParam("clientCode") String clientCode, @PathParam("itemCode") String itemCode, @Context UriInfo uriInfo) {
+		
+		CartDTO dto = cartService.removeItemCart(clientCode, itemCode);
+		
+		if(dto != null) {
+			if(dto.getStatusCode() == HttpServletResponse.SC_OK) {
+				UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
+				uriBuilder.path("/carts/" + dto.getCart().getClientCode());
+				return Response.ok().build();
+			}
+		}
+		return Response.status(HttpServletResponse.SC_NOT_FOUND).build();
+	}
+	
+	@GET
+	@Path("/carts/statistics/averageticket")
+	@Produces("application/json")
+	public Response getAverageTicketValue() {
+		
+		BigDecimal averageTicket = cartService.getTicketAverageValue();
+		
+		if(averageTicket != null && !averageTicket.equals(BigDecimal.ZERO)) {
+			Map<String, BigDecimal> jsonMap = new HashMap<String, BigDecimal>();
+			jsonMap.put("averageTicket", averageTicket);
+			return Response.ok().entity(new Gson().toJson(jsonMap)).build();
+		}
+
+		return Response.noContent().build(); 
 	}
 	
 	

@@ -63,15 +63,30 @@ public class Cart {
 	}
 	
 	public Collection<ItemCart> getItemList() {
-		return this.itemsList;
+		return itemsList;
 	}
 	
 	public BigDecimal getTotalValue() {
-		return BigDecimal.ZERO;
+		
+		BigDecimal totalValue = BigDecimal.ZERO;
+		
+		for (ItemCart itemCart : itemsList) {
+			totalValue = totalValue.add(itemCart.getUnitaryValue());
+		}
+		return totalValue;
 	}
 
-	public boolean removeItem() {
-		return false;
+	public String removeItem(String itemCode) {
+		
+		if (itemCode != null) {
+			for (ItemCart i : itemsList) {
+				if (i.getCode().equals(itemCode)) {
+					itemsList.remove(i);
+					return OperationStatus.MODIFIED.toString();
+				}
+			}
+		}
+		return null;
 	}
 
 }
