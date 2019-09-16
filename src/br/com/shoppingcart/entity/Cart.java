@@ -1,28 +1,23 @@
 package br.com.shoppingcart.entity;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import com.google.gson.Gson;
-
-import br.com.shoppingcart.dto.ItemCartDTO;
 import br.com.shoppingcart.enums.OperationStatus;
 
-@XmlRootElement
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.util.Collection;
+
+@Entity
 public class Cart {
 
-	private String clientCode;
-	private List<ItemCart> itemsList = Collections.synchronizedList(new ArrayList<ItemCart>());
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+		private String clientCode;
 
-	public Cart(String clientCode) {
-		this.clientCode = clientCode;
-	}
+	@OneToMany(fetch = FetchType.LAZY)
+	private Collection<ItemCart> itemsList;
+
+	public Cart(){}
 
 	public String getClientCode() {
 		return clientCode;
@@ -33,18 +28,18 @@ public class Cart {
 	}
 
 	/**
-	 * Permite a adição de um novo item no carrinho de compras.
+	 * Permite adicionar de um novo item no carrinho de compras.
 	 *
-	 * Caso o item já exista no carrinho para este mesmo produto: 
-	 * A quantidade do item será a soma da quantidade atual com a quantidade passada como parâmetro.
-	 * Se o valor unitário informado for diferente do valor unitário atual do item, o novo
-	 * valor unitário do item será o passado como parâmetro.
+	 * Caso o item jï¿½ exista no carrinho para este mesmo produto: 
+	 * A quantidade do item serï¿½ a soma da quantidade atual com a quantidade passada como parï¿½metro.
+	 * Se o valor unitï¿½rio informado for diferente do valor unitï¿½rio atual do item, o novo
+	 * valor unitï¿½rio do item serï¿½ o passado como parï¿½metro.
 	 *
-	 * @param ItemCart
+	 * @param itemCart
 	 */
 	public String addItem(ItemCart itemCart) {
 
-		if (itemCart != null && itemCart.getCode() != null) {
+		if (itemCart != null && itemCart.getId() != null) {
 			for (ItemCart i : itemsList) {
 				if (i.equals(itemCart)) {
 
@@ -61,11 +56,19 @@ public class Cart {
 		}
 		return null;
 	}
-	
-	public Collection<ItemCart> getItemList() {
+
+	public Long getId() {
+		return id;
+	}
+
+	public Collection<ItemCart> getItemsList() {
 		return itemsList;
 	}
-	
+
+	public void setItemsList(Collection<ItemCart> itemsList) {
+		this.itemsList = itemsList;
+	}
+
 	public BigDecimal getTotalValue() {
 		
 		BigDecimal totalValue = BigDecimal.ZERO;
@@ -76,11 +79,11 @@ public class Cart {
 		return totalValue;
 	}
 
-	public String removeItem(String itemCode) {
+	public String removeItem(Long id) {
 		
-		if (itemCode != null) {
+		if (id != null) {
 			for (ItemCart i : itemsList) {
-				if (i.getCode().equals(itemCode)) {
+				if (i.getId().equals(id)) {
 					itemsList.remove(i);
 					return OperationStatus.MODIFIED.toString();
 				}

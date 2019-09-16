@@ -76,7 +76,7 @@ public class ShoppingCartController {
 			if (dto.getStatusCode() == 409) {
 
 				Map<String, String> jsonMap = new HashMap<String, String>();
-				jsonMap.put("error", "Já existe um carrinho ativo para este cliente.");
+				jsonMap.put("error", "JÃ¡ existe um carrinho ativo para este cliente.");
 				return Response.status(409).entity(new Gson().toJson(jsonMap)).build();
 			}
 			UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
@@ -121,11 +121,11 @@ public class ShoppingCartController {
 	}
 	
 	@DELETE
-	@Path("/carts/{clientCode}/items/{itemCode}")
+	@Path("/carts/{clientCode}/items/{itemId}")
 	@Produces("application/json")
-	public Response removeItemCart(@PathParam("clientCode") String clientCode, @PathParam("itemCode") String itemCode, @Context UriInfo uriInfo) {
-		
-		CartDTO dto = cartService.removeItemCart(clientCode, itemCode);
+	public Response removeItemCart(@PathParam("clientCode") String clientCode, @PathParam("itemId") Long itemId, @Context UriInfo uriInfo) {
+
+		CartDTO dto = cartService.removeItemCart(clientCode, itemId);
 		
 		if(dto != null) {
 			if(dto.getStatusCode() == HttpServletResponse.SC_OK) {

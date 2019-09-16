@@ -1,29 +1,29 @@
 package br.com.shoppingcart.service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.servlet.http.HttpServletResponse;
-
-import org.omg.CORBA.portable.ApplicationException;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-
+import br.com.shoppingcart.dao.BaseDAOImpl;
+import br.com.shoppingcart.dao.CartDAO;
 import br.com.shoppingcart.dto.CartDTO;
 import br.com.shoppingcart.dto.CartListDTO;
 import br.com.shoppingcart.entity.Cart;
 import br.com.shoppingcart.entity.ItemCart;
 import br.com.shoppingcart.enums.OperationStatus;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import org.omg.CORBA.portable.ApplicationException;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.swing.text.Caret;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ShoppingCartService {
 
 	private static List<Cart> cartList = Collections.synchronizedList(new ArrayList<Cart>());
 	
 	public ShoppingCartService() {}
-	
+
 	/**
 	 * Retorna a lista de carrinhos ativos
 	 * @return
@@ -38,12 +38,12 @@ public class ShoppingCartService {
 	
 	
 	/**
-	 * Retorna o carrinho do cliente passado como par‚metro
+	 * Retorna o carrinho do cliente passado como parÔøΩmetro
 	 * @param clientCode
 	 * @return
 	 */
 	public CartDTO getCart(String clientCode) {
-
+		BaseDAOImpl<Cart> dao = new BaseDAOImpl<Cart>();
 		if (!cartList.isEmpty()) {
 			for(Cart c : cartList) {
 				if(c.getClientCode().equals(clientCode)) {
@@ -56,28 +56,32 @@ public class ShoppingCartService {
 
 	/**
 	 * Cria e retorna um novo carrinho de compras para o cliente passado como
-	 * par‚metro.
+	 * par√¢metro.
 	 *
-	 * Caso j· exista um carrinho de compras para o cliente passado como par‚metro,
-	 * este carrinho dever· ser retornado.
+	 * Caso j√° exista um carrinho de compras para o cliente passado como par√¢metro,
+	 * este carrinho dever√° ser retornado.
 	 *
-	 * @param String
+	 * @param json
 	 * @return CartDTO
 	 * @throws ApplicationException
 	 */
 
 	public CartDTO createCart(String json) throws ApplicationException {
 
+		CartDAO dao = new CartDAO();
 		try {
-			Cart cart = new Gson().fromJson(json, Cart.class);
-			if (cart != null) {
-				for (Cart c : cartList) {
-					if (c.getClientCode().equals(cart.getClientCode())) {
-						return new CartDTO(cart, 409);
-					}
+			Cart jsonCart = new Gson().fromJson(json, Cart.class);
+			if (jsonCart != null) {
+
+				if(jsonCart.getId() != null){
+
 				}
-				cartList.add(cart);
-				return new CartDTO(cart, 201);
+				Cart dataBaseCart = dao.findByClientCode(jsonCart.getClientCode());
+				if(dataBaseCart == null) {
+					dao.create(jsonCart);
+					return new CartDTO(jsonCart, 201);
+				}
+				return new CartDTO(dataBaseCart, 409);
 			}
 		} catch (Exception e) {
 			throw new ApplicationException(json, null);
@@ -86,9 +90,9 @@ public class ShoppingCartService {
 	}
 
 	/**
-	 * Retorna o valor do ticket mÈdio no momento da chamada ao mÈtodo. O valor do
-	 * ticket mÈdio È a soma do valor total de todos os carrinhos de compra dividido
-	 * pela quantidade de carrinhos de compra. O valor retornado dever· ser
+	 * Retorna o valor do ticket m√©dio no momento da chamada ao m√©todo. O valor do
+	 * ticket m√©dio √© a soma do valor total de todos os carrinhos de compra dividido
+	 * pela quantidade de carrinhos de compra. O valor retornado dever√° ser
 	 * arredondado com duas casas decimais, seguindo a regra: 0-4 deve ser
 	 * arredondado para baixo e 5-9 deve ser arredondado para cima.
 	 *
@@ -110,12 +114,12 @@ public class ShoppingCartService {
 
 	/**
 	 * Remove um carrinho de compras quando o cliente faz um checkout ou sua
-	 * sess„o expirar. Deve ser efetuada a remoÁ„o do carrinho do cliente passado
-	 * como par‚metro da listagem de carrinhos de compras.
+	 * sess√£o expirar. Deve ser efetuada a remo√ß√£o do carrinho do cliente passado
+	 * como par√¢metro da listagem de carrinhos de compras.
 	 *
 	 * @param identificacaoCliente
 	 * @return Retorna um boolean, tendo o valor true caso o cliente passado como
-	 *         par‰metro tenha um carrinho de compras e e false caso o cliente n„o
+	 *         par√¢metro tenha um carrinho de compras e e false caso o cliente n√£o
 	 *         possua um carrinho.
 	 */
 	public boolean removeCart(String identificacaoCliente) {
@@ -160,12 +164,12 @@ public class ShoppingCartService {
 	/**
 	 * Remove um item do carrinho
 	 */
-	public CartDTO removeItemCart(String clientCode, String itemCode) {
+	public CartDTO removeItemCart(String clientCode, Long itemCartId) {
 		
 		for(Cart cart: cartList) {
 			if(cart.getClientCode().equals(clientCode)) {
 				
-				String opStatus = cart.removeItem(itemCode);
+				String opStatus = cart.removeItem(itemCartId);
 				
 				if(opStatus != null && opStatus.equals(OperationStatus.MODIFIED.toString())) {
 					return new CartDTO(cart, HttpServletResponse.SC_OK);

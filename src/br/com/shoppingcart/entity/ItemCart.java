@@ -1,28 +1,28 @@
 package br.com.shoppingcart.entity;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.math.BigDecimal;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement
+@Entity
 public class ItemCart {
 
-	private String code;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 	private BigDecimal unitaryValue;
 	private long quantity;
 
-	public ItemCart(String code, BigDecimal unitaryValue, long quantity) {
-		this.code = code;
-		this.unitaryValue = unitaryValue;
-		this.quantity = quantity;
+	public ItemCart(){}
+
+	public Long getId() {
+		return id;
 	}
 
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public BigDecimal getUnitaryValue() {
@@ -41,13 +41,6 @@ public class ItemCart {
 		this.quantity = quantity;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((code == null) ? 0 : code.hashCode());
-		return result;
-	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -58,10 +51,10 @@ public class ItemCart {
 		if (getClass() != obj.getClass())
 			return false;
 		ItemCart other = (ItemCart) obj;
-		if (code == null) {
-			if (other.code != null)
+		if (id == null) {
+			if (other.id != null)
 				return false;
-		} else if (!code.equals(other.code))
+		} else if (!id.equals(other.id))
 			return false;
 		return true;
 	}
