@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 
 @Entity
-public class Cart {
+public class Cart implements BaseEntity{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,8 +16,8 @@ public class Cart {
 
 	@OneToMany(fetch = FetchType.LAZY)
 	private Collection<ItemCart> itemsList;
-
 	public Cart(){}
+
 
 	public String getClientCode() {
 		return clientCode;

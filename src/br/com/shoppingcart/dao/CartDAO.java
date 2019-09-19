@@ -9,6 +9,10 @@ import java.util.List;
 
 public class CartDAO extends BaseDAOImpl<Cart> {
 
+    public CartDAO(){
+        super();
+    }
+
     public Cart findByClientCode(String clientCode) {
         EntityManager em = ConnectionFactory.getEmf().createEntityManager();
         Query query = em.createQuery("select c from Cart c where c.clientCode = :clientCode");
