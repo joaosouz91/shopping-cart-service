@@ -12,12 +12,13 @@ public class Cart implements BaseEntity{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-		private String clientCode;
 
-	@OneToMany(fetch = FetchType.LAZY)
+	private String clientCode;
+
+	@OneToMany(fetch = FetchType.EAGER)
 	private Collection<ItemCart> itemsList;
-	public Cart(){}
 
+	public Cart(){}
 
 	public String getClientCode() {
 		return clientCode;

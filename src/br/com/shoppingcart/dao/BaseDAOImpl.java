@@ -5,11 +5,10 @@ import br.com.shoppingcart.entity.BaseEntity;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 
 public class BaseDAOImpl<T extends BaseEntity> implements DAOInterface<T> {
-
-    private Class<T> persistentClass;
 
     public BaseDAOImpl(){}
 
@@ -39,7 +38,7 @@ public class BaseDAOImpl<T extends BaseEntity> implements DAOInterface<T> {
     @Override
     public void remove(T t) {
         EntityManager em = ConnectionFactory.getEmf().createEntityManager();
-        T tt = em.find(persistentClass, t.getId());
+        T tt = (T) em.find(getPersistentClass(), t.getId());
         em.getTransaction().begin();
         em.remove(tt);
         em.getTransaction().commit();
@@ -51,7 +50,8 @@ public class BaseDAOImpl<T extends BaseEntity> implements DAOInterface<T> {
     public Collection<T> findAll() {
         EntityManager em = ConnectionFactory.getEmf().createEntityManager();
         em.getTransaction().begin();
-        Query query = em.createQuery("Select t.type from " + persistentClass.getSimpleName() + " t");
+        String clazz = getPersistentClass().getSimpleName();
+        Query query = em.createQuery("Select t from " + clazz + " t");
         Collection<T> list = query.getResultList();
         em.getTransaction().commit();
         em.close();
@@ -62,9 +62,14 @@ public class BaseDAOImpl<T extends BaseEntity> implements DAOInterface<T> {
     public T findById(Long id) {
         EntityManager em = ConnectionFactory.getEmf().createEntityManager();
         em.getTransaction().begin();
-        T t = em.find(persistentClass, id);
+        T t = (T) em.find(getPersistentClass(), id);
         em.getTransaction().commit();
         em.close();
         return t;
+    }
+
+    public Class<?> getPersistentClass() {
+        ParameterizedType type = (ParameterizedType) this.getClass().getGenericSuperclass();
+        return (Class<?>) type.getActualTypeArguments()[0];
     }
 }

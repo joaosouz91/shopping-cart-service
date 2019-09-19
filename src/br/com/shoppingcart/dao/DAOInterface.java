@@ -1,10 +1,6 @@
 package br.com.shoppingcart.dao;
 
-import br.com.shoppingcart.entity.BaseEntity;
-
-import java.io.Serializable;
 import java.util.Collection;
-import java.util.List;
 
 public interface DAOInterface<T> {
 
